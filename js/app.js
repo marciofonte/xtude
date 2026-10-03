@@ -4,31 +4,22 @@ const ADMIN_PASS = "admin123";
 // Link do seu afiliado / anunciante
 const LINK_AFILIADO = "https://seu-link-de-afiliado.com";
 
-// Configuração da RapidAPI (JSON Porn)
+// Configuração da RapidAPI (XVideos API)
 const RAPIDAPI_KEY = "debd55a99emsh1e701cfe669bf09p16f03cjsn7f0cb107582d"; 
-const RAPIDAPI_HOST = "json-porn.p.rapidapi.com";
+const RAPIDAPI_HOST = "porn-xnxx-api.p.rapidapi.com"; // Ajuste para o host exato da sua API do XVideos/XNXX na RapidAPI
 
 // Rastreador de cliques por ID de vídeo
 const videoClickTracker = {};
 
-// Vídeos de Exemplo (Plano de fundo para garantir exibição)
+// Dados de Exemplo caso a API demore ou falhe
 const defaultVideos = [
   {
     id: "demo_1",
-    title: "Vídeo de Exemplo 1 - Conteúdo em Destaque",
-    url: "https://www.google.com",
+    title: "Vídeo de Exemplo - Destaque",
+    url: "https://www.xvideos.com",
     thumb: "https://picsum.photos/400/225?random=1",
     categories: ["destaque", "geral"],
-    desc: "Vídeo demonstrativo",
-    date: new Date().toLocaleDateString('pt-BR')
-  },
-  {
-    id: "demo_2",
-    title: "Vídeo de Exemplo 2 - Lançamentos",
-    url: "https://www.google.com",
-    thumb: "https://picsum.photos/400/225?random=2",
-    categories: ["lançamentos"],
-    desc: "Vídeo demonstrativo 2",
+    desc: "Demonstração",
     date: new Date().toLocaleDateString('pt-BR')
   }
 ];
@@ -84,13 +75,13 @@ async function initHomePage() {
   renderVideos(allVideos);
 }
 
-// ---- Busca de Conteúdo na RapidAPI ----
+// ---- Busca de Conteúdo na RapidAPI (XVideos) ----
 async function fetchVideosFromApi() {
   if (!RAPIDAPI_KEY) return [];
 
   try {
-    // Adicionado parâmetro timestamp (&_t=...) para evitar cache antigo no navegador
-    const response = await fetch(`https://${RAPIDAPI_HOST}/Search?query=all&count=20&_t=${Date.now()}`, {
+    // Requisição para a API do XVideos/XNXX
+    const response = await fetch(`https://${RAPIDAPI_HOST}/trending`, {
       method: 'GET',
       headers: {
         'x-rapidapi-key': RAPIDAPI_KEY,
@@ -99,12 +90,12 @@ async function fetchVideosFromApi() {
     });
 
     if (!response.ok) {
-      console.error("Erro na API:", response.status, response.statusText);
+      console.error("Erro na API do XVideos:", response.status, response.statusText);
       return [];
     }
 
     const data = await response.json();
-    console.log("Dados recebidos da API:", data);
+    console.log("Dados do XVideos recebidos:", data);
 
     let items = [];
     if (Array.isArray(data)) {
@@ -115,15 +106,15 @@ async function fetchVideosFromApi() {
 
     return items.map((item, index) => ({
       id: `api_${item.id || index}_${Date.now()}`,
-      title: item.title || item.name || "Conteúdo Especial",
-      url: item.url || item.link || item.website || "https://www.google.com",
-      thumb: item.poster || item.image || item.thumb || "https://picsum.photos/400/225",
-      categories: Array.isArray(item.tags) ? item.tags : [item.category || "geral"],
+      title: item.title || "Vídeo XVideos",
+      url: item.link || item.url || "https://www.xvideos.com",
+      thumb: item.thumbnail || item.poster || item.image || "https://picsum.photos/400/225",
+      categories: Array.isArray(item.tags) ? item.tags : [item.category || "trending"],
       desc: item.description || "",
       date: new Date().toLocaleDateString('pt-BR')
     }));
   } catch (error) {
-    console.error("Erro na requisição da API:", error);
+    console.error("Erro na requisição:", error);
     return [];
   }
 }
@@ -199,7 +190,7 @@ function handleVideoClick(videoId) {
     if (video) {
       window.open(video.url, '_blank');
     } else {
-      window.open("https://www.google.com", '_blank');
+      window.open("https://www.xvideos.com", '_blank');
     }
   }
 }
@@ -307,7 +298,7 @@ function updateVideo(event) {
   const videoIndex = videos.findIndex(v => String(v.id) === String(id));
   if (videoIndex === -1) return;
 
-  videos[videoIndex].title = document.getElementById('editVTitle').value;
+  videos[videoIndex].title = document.getElementById('editVTitle'].value;
   videos[videoIndex].url = document.getElementById('editVUrl').value;
   videos[videoIndex].thumb = document.getElementById('editVThumb').value;
   videos[videoIndex].categories = document.getElementById('editVCategories').value.split(',').map(c => c.trim());
