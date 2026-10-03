@@ -16,7 +16,7 @@ async function initApp() {
 // 1. Função para carregar os vídeos do ficheiro videos.json local
 async function loadVideosData() {
     try {
-        const response = await fetch('js/videos.json');
+        const response = await fetch('./js/videos.json');
         if (!response.ok) {
             throw new Error(`Erro HTTP: ${response.status}`);
         }
@@ -24,49 +24,49 @@ async function loadVideosData() {
         renderVideos(allVideos);
     } catch (error) {
         console.error("Erro ao carregar os vídeos:", error);
-        showEmptyState("Não foi possível carregar os vídeos. Executa o gerador no teu PC.");
+        showEmptyState("Não foi possível carregar os vídeos. Executa o gerador no teu PC e envia para o GitHub.");
     }
 }
 
-// 2. Renderizar os vídeos no ecra
+// 2. Renderizar os vídeos no ecrã (utilizando o id 'videoGrid' do teu HTML)
 function renderVideos(videos) {
-    const container = document.getElementById('videos-container');
+    const container = document.getElementById('videoGrid');
     if (!container) return;
 
     if (!videos || videos.length === 0) {
-        container.innerHTML = `<p class="no-videos">Nenhum vídeo encontrado.</p>`;
+        container.innerHTML = `<p class="no-videos text-center text-muted w-100">Nenhum vídeo encontrado.</p>`;
         return;
     }
 
     container.innerHTML = videos.map(video => `
-        <div class="video-card" data-id="${video.id}">
-            <div class="video-thumb">
-                <img src="${video.thumb}" alt="${video.title}" loading="lazy">
-                <span class="video-duration">${video.desc || ''}</span>
-            </div>
-            <div class="video-info">
-                <h3 class="video-title">${video.title}</h3>
-                <div class="video-meta">
-                    <span class="video-date">${video.date || ''}</span>
+        <div class="col">
+            <div class="card h-100 bg-dark text-white video-card shadow-sm" style="cursor: pointer;" data-url="${video.url}">
+                <img src="${video.thumb}" class="card-img-top" alt="${video.title}" loading="lazy" style="height: 160px; object-fit: cover;">
+                <div class="card-body p-2 d-flex flex-column">
+                    <h6 class="card-title text-truncate fs-6 mb-1">${video.title}</h6>
+                    <div class="mt-auto d-flex justify-content-between align-items-center pt-2">
+                        <small class="text-danger">${video.desc || ''}</small>
+                        <small class="text-muted">${video.date || ''}</small>
+                    </div>
                 </div>
             </div>
         </div>
     `).join('');
 
-    // Adicionar evento de clique para abrir o vídeo (se aplicável)
-    document.querySelectorAll('.video-card').forEach((card, index) => {
+    // Adicionar evento de clique para abrir o link do vídeo
+    document.querySelectorAll('.video-card').forEach(card => {
         card.addEventListener('click', () => {
-            const video = videos[index];
-            if (video && video.url) {
-                window.open(video.url, '_blank');
+            const url = card.getAttribute('data-url');
+            if (url) {
+                window.open(url, '_blank');
             }
         });
     });
 }
 
-// 3. Configurar ouvintes de eventos globais
+// 3. Configurar ouvintes de eventos globais (Pesquisa)
 function setupEventListeners() {
-    const searchInput = document.getElementById('search-input');
+    const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
@@ -78,18 +78,40 @@ function setupEventListeners() {
     }
 }
 
-// Exemplo da função de edição corrigida (incluindo a correção da linha 301)
+function searchVideos(event) {
+    event.preventDefault();
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        const query = searchInput.value.toLowerCase();
+        const filtered = allVideos.filter(v => 
+            v.title.toLowerCase().includes(query)
+        );
+        renderVideos(filtered);
+    }
+}
+
+function filterCategory(category) {
+    if (category === 'all') {
+        renderVideos(allVideos);
+    } else {
+        const filtered = allVideos.filter(v => 
+            v.categories && v.categories.includes(category)
+        );
+        renderVideos(filtered);
+    }
+}
+
+// Exemplo da função de edição corrigida (linha 301)
 function handleVideoEdit(videoIndex) {
     if (allVideos[videoIndex]) {
-        // Linha 301 corrigida com parênteses curvos corretos:
         allVideos[videoIndex].title = document.getElementById('editVTitle').value;
         renderVideos(allVideos);
     }
 }
 
 function showEmptyState(message) {
-    const container = document.getElementById('videos-container');
+    const container = document.getElementById('videoGrid');
     if (container) {
-        container.innerHTML = `<p class="no-videos">${message}</p>`;
+        container.innerHTML = `<p class="text-center text-muted w-100">${message}</p>`;
     }
 }
