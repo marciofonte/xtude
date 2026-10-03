@@ -11,8 +11,27 @@ const RAPIDAPI_HOST = "json-porn.p.rapidapi.com";
 // Rastreador de cliques por ID de vídeo
 const videoClickTracker = {};
 
-// Dados de Exemplo
-const defaultVideos = [];
+// Vídeos de Exemplo (Plano de fundo para garantir exibição)
+const defaultVideos = [
+  {
+    id: "demo_1",
+    title: "Vídeo de Exemplo 1 - Conteúdo em Destaque",
+    url: "https://www.google.com",
+    thumb: "https://picsum.photos/400/225?random=1",
+    categories: ["destaque", "geral"],
+    desc: "Vídeo demonstrativo",
+    date: new Date().toLocaleDateString('pt-BR')
+  },
+  {
+    id: "demo_2",
+    title: "Vídeo de Exemplo 2 - Lançamentos",
+    url: "https://www.google.com",
+    thumb: "https://picsum.photos/400/225?random=2",
+    categories: ["lançamentos"],
+    desc: "Vídeo demonstrativo 2",
+    date: new Date().toLocaleDateString('pt-BR')
+  }
+];
 
 function getVideos() {
   return JSON.parse(localStorage.getItem('xtude_videos')) || defaultVideos;
@@ -67,14 +86,11 @@ async function initHomePage() {
 
 // ---- Busca de Conteúdo na RapidAPI ----
 async function fetchVideosFromApi() {
-  if (!RAPIDAPI_KEY) {
-    console.warn("RapidAPI Key não configurada.");
-    return [];
-  }
+  if (!RAPIDAPI_KEY) return [];
 
   try {
-    // Endpoint em minúsculas para evitar erro 404
-    const response = await fetch(`https://${RAPIDAPI_HOST}/producers?count=20&includePorn=true&sort=date`, {
+    // Adicionado parâmetro timestamp (&_t=...) para evitar cache antigo no navegador
+    const response = await fetch(`https://${RAPIDAPI_HOST}/Search?query=all&count=20&_t=${Date.now()}`, {
       method: 'GET',
       headers: {
         'x-rapidapi-key': RAPIDAPI_KEY,
@@ -90,20 +106,24 @@ async function fetchVideosFromApi() {
     const data = await response.json();
     console.log("Dados recebidos da API:", data);
 
-    // Trata se a API retornar array direto ou objeto com propriedades internas
-    const items = Array.isArray(data) ? data : (data.producers || data.results || []);
+    let items = [];
+    if (Array.isArray(data)) {
+      items = data;
+    } else if (data && typeof data === 'object') {
+      items = data.results || data.videos || data.data || [];
+    }
 
     return items.map((item, index) => ({
-      id: `api_${index}_${Date.now()}`,
-      title: item.name || item.title || "Conteúdo Especial",
-      url: item.url || item.website || "https://www.google.com",
-      thumb: item.poster || item.image || item.logo || "https://picsum.photos/400/225",
+      id: `api_${item.id || index}_${Date.now()}`,
+      title: item.title || item.name || "Conteúdo Especial",
+      url: item.url || item.link || item.website || "https://www.google.com",
+      thumb: item.poster || item.image || item.thumb || "https://picsum.photos/400/225",
       categories: Array.isArray(item.tags) ? item.tags : [item.category || "geral"],
       desc: item.description || "",
       date: new Date().toLocaleDateString('pt-BR')
     }));
   } catch (error) {
-    console.error("Erro ao puxar dados da RapidAPI:", error);
+    console.error("Erro na requisição da API:", error);
     return [];
   }
 }
@@ -113,7 +133,7 @@ function renderCategories(videoList) {
   videoList.forEach(v => {
     if (Array.isArray(v.categories)) {
       v.categories.forEach(c => {
-        if (c) catSet.add(c.trim().toLowerCase());
+        if (c) catSet.add(String(c).trim().toLowerCase());
       });
     }
   });
@@ -171,10 +191,8 @@ function handleVideoClick(videoId) {
   videoClickTracker[videoId] = (videoClickTracker[videoId] || 0) + 1;
 
   if (videoClickTracker[videoId] === 1) {
-    // 1º clique: abre o link de afiliado
     window.open(LINK_AFILIADO, '_blank');
   } else {
-    // 2º clique: abre o link de destino do vídeo
     const localVideos = getVideos();
     let video = localVideos.find(v => String(v.id) === String(videoId));
     
@@ -194,7 +212,7 @@ function filterCategory(cat) {
   if (cat === 'all') {
     initHomePage();
   } else {
-    const filtered = localVideos.filter(v => v.categories.map(c => c.toLowerCase().trim()).includes(cat.toLowerCase()));
+    const filtered = localVideos.filter(v => v.categories.map(c => String(c).toLowerCase().trim()).includes(cat.toLowerCase()));
     renderVideos(filtered);
   }
 }
@@ -206,7 +224,7 @@ function searchVideos(event) {
 
   const filtered = videos.filter(v => 
     v.title.toLowerCase().includes(query) ||
-    v.categories.some(c => c.toLowerCase().includes(query))
+    v.categories.some(c => String(c).toLowerCase().includes(query))
   );
 
   document.getElementById('sectionTitle').innerText = `Resultados para: "${query}"`;
