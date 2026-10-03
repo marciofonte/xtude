@@ -298,7 +298,7 @@ function updateVideo(event) {
   const videoIndex = videos.findIndex(v => String(v.id) === String(id));
   if (videoIndex === -1) return;
 
-  videos[videoIndex].title = document.getElementById('editVTitle'].value;
+  videos[videoIndex].title = document.getElementById('editVTitle').value;
   videos[videoIndex].url = document.getElementById('editVUrl').value;
   videos[videoIndex].thumb = document.getElementById('editVThumb').value;
   videos[videoIndex].categories = document.getElementById('editVCategories').value.split(',').map(c => c.trim());
