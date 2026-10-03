@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XTUDE - Painel Administrativo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="navbar navbar-dark bg-black border-bottom border-danger">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-danger" href="index.html">XTUDE <span class="fs-6 text-white">| Painel de Controle</span></a>
+      <a href="index.html" class="btn btn-outline-light btn-sm"><i class="bi bi-house-door me-1"></i>Voltar ao Site</a>
+    </div>
+  </nav>
+
+  <div class="container my-5">
+    <!-- Login Simples -->
+    <div id="loginArea" class="row justify-content-center">
+      <div class="col-md-4">
+        <div class="card p-4">
+          <h4 class="text-center mb-3">Acesso Restrito</h4>
+          <input type="password" id="adminPassword" class="form-control mb-3" placeholder="Digite a senha do painel">
+          <button class="btn btn-danger w-100" onclick="loginAdmin()">Entrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel de Gerenciamento -->
+    <div id="adminContent" class="d-none">
+      <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active text-white" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videosPanel">Cadastrar Vídeo</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link text-white" id="ads-tab" data-bs-toggle="tab" data-bs-target="#adsPanel">Gerenciar Anúncios</button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="adminTabContent">
+        <!-- Aba Vídeos -->
+        <div class="tab-pane fade show active" id="videosPanel">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="card p-3 mb-4">
+                <h5>Adicionar Novo Vídeo</h5>
+                <form id="videoForm" onsubmit="addVideo(event)">
+                  <div class="mb-3">
+                    <label class="form-label">Título do Vídeo</label>
+                    <input type="text" id="vTitle" class="form-control" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Link do Vídeo</label>
+                    <input type="url" id="vUrl" class="form-control" placeholder="https://..." required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">URL da Thumbnail / Capa</label>
+                    <input type="text" id="vThumb" class="form-control" placeholder="img/minha-capa.jpg ou https://..." required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Categorias (separadas por vírgula)</label>
+                    <input type="text" id="vCategories" class="form-control" placeholder="fofoca, famosos" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Descrição</label>
+                    <textarea id="vDesc" class="form-control" rows="3"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-danger w-100">Salvar Vídeo</button>
+                </form>
+              </div>
+            </div>
+            
+            <div class="col-md-7">
+              <h5>Vídeos Cadastrados</h5>
+              <div class="table-responsive">
+                <table class="table table-dark table-striped align-middle">
+                  <thead>
+                    <tr>
+                      <th>Capa</th>
+                      <th>Título</th>
+                      <th>Categorias</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminVideoList"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aba Anúncios -->
+        <div class="tab-pane fade" id="adsPanel">
+          <div class="card p-4">
+            <h5>Configuração de Scripts de Anúncios / Afiliados</h5>
+            <form onsubmit="saveAds(event)">
+              <div class="mb-3">
+                <label class="form-label">Anúncio Topo (Banner Superior)</label>
+                <textarea id="adTopCode" class="form-control" rows="3" placeholder="Cole aqui seu código HTML"></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Anúncio Rodapé (Banner Inferior)</label>
+                <textarea id="adBottomCode" class="form-control" rows="3" placeholder="Cole aqui seu código HTML"></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Anúncio do Player</label>
+                <textarea id="adVideoCode" class="form-control" rows="3" placeholder="Cole aqui seu código HTML"></textarea>
+              </div>
+              <button type="submit" class="btn btn-success">Salvar Anúncios</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Edição de Vídeo -->
+  <div class="modal fade" id="editVideoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Vídeo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editVideoForm" onsubmit="updateVideo(event)">
+            <input type="hidden" id="editVId">
+            <div class="mb-3">
+              <label class="form-label">Título do Vídeo</label>
+              <input type="text" id="editVTitle" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Link do Vídeo</label>
+              <input type="url" id="editVUrl" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">URL da Thumbnail / Capa</label>
+              <input type="text" id="editVThumb" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Categorias (separadas por vírgula)</label>
+              <input type="text" id="editVCategories" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Descrição</label>
+              <textarea id="editVDesc" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Salvar Alterações</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

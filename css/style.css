@@ -1,0 +1,15 @@
+/* Customizações para o XTUDE */
+.card-img-top { 
+  height: 180px; 
+  object-fit: cover; 
+}
+
+.ad-banner { 
+  min-height: 90px; 
+  background-color: #2b3035; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  text-align: center; 
+  border: 1px dashed #6c757d; 
+}

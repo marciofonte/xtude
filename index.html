@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XTUDE - Conteúdo Adulto</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- CSS Customizado -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Modal Aviso +18 -->
+  <div class="modal fade" id="ageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-header bg-danger text-white justify-content-center">
+          <h5 class="modal-title fs-4"><i class="bi bi-exclamation-triangle-fill me-2"></i>ATENÇÃO: CONTEÚDO ADULTO</h5>
+        </div>
+        <div class="modal-body p-4">
+          <p class="fs-5">Este site contém material voltado para maiores de idade (+18) com temas sensíveis e pesados.</p>
+          <p>Você confirma que tem 18 anos ou mais?</p>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-danger btn-lg px-4" onclick="confirmAge(true)">Sou Maior de 18 Anos</button>
+          <button type="button" class="btn btn-secondary btn-lg px-4" onclick="confirmAge(false)">Sair do Site</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-black sticky-top border-bottom border-danger">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-danger fs-3" href="index.html">X<span class="text-white">TUDE</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navContent">
+        <form class="d-flex mx-auto my-2 my-lg-0 w-50" onsubmit="searchVideos(event)">
+          <input class="form-control me-2" type="search" id="searchInput" placeholder="Buscar por título, tag ou categoria (ex: fofoca)...">
+          <button class="btn btn-outline-danger" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+        <a href="admin.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-gear-fill me-1"></i>Painel Admin</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container my-4">
+    <!-- Banner de Anúncio Topo -->
+    <div class="ad-banner mb-4 rounded" id="adContainerTop"></div>
+
+    <!-- Filtros de Categoria -->
+    <div class="d-flex flex-wrap gap-2 mb-4 justify-content-center" id="categoryButtons">
+      <button class="btn btn-danger btn-sm" onclick="filterCategory('all')">Todos</button>
+    </div>
+
+    <!-- Grid de Vídeos -->
+    <h3 class="border-start border-danger border-4 ps-2 mb-3" id="sectionTitle">Vídeos Recentes</h3>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="videoGrid"></div>
+
+    <!-- Banner de Anúncio Rodapé -->
+    <div class="ad-banner mt-5 rounded" id="adContainerBottom"></div>
+  </div>
+
+  <!-- Modal de Reprodução de Vídeo -->
+  <div class="modal fade" id="videoModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="videoModalTitle">Título do Vídeo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="ratio ratio-16x9 mb-3" id="videoPlayerContainer"></div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-danger" id="videoModalCategory">Categoria</span>
+            <small class="text-muted" id="videoModalDate"></small>
+          </div>
+          <p class="text-light" id="videoModalDescription"></p>
+          
+          <!-- Banner de Anúncio Interno do Vídeo -->
+          <div class="ad-banner mt-3 rounded" id="adContainerVideo"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- JS Customizado -->
+  <script src="js/app.js"></script>
+</body>
+</html>
