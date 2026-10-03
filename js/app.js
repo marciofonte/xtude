@@ -16,7 +16,7 @@ async function initApp() {
 // 1. Função para carregar os vídeos do ficheiro videos.json local
 async function loadVideosData() {
     try {
-        const response = await fetch('videos.json');
+        const response = await fetch('js/videos.json');
         if (!response.ok) {
             throw new Error(`Erro HTTP: ${response.status}`);
         }
