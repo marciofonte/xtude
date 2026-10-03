@@ -94,9 +94,17 @@ function filterCategory(category) {
     if (category === 'all') {
         renderVideos(allVideos);
     } else {
-        const filtered = allVideos.filter(v => 
-            v.categories && v.categories.includes(category)
-        );
+        const filtered = allVideos.filter(v => {
+            if (!v.categories) return false;
+            // Se categories for um array, verifica se algum item bate (ignorando maiúsculas/minúsculas)
+            if (Array.isArray(v.categories)) {
+                return v.categories.some(cat => 
+                    cat.toLowerCase().trim() === category.toLowerCase().trim()
+                );
+            }
+            // Se por acaso no JSON for uma string única separada por vírgula ou texto
+            return String(v.categories).toLowerCase().includes(category.toLowerCase());
+        });
         renderVideos(filtered);
     }
 }
